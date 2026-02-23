@@ -1,12 +1,12 @@
-async function fetchFBVideo() {
+window.fetchFB = async () => {
     const urlInput = document.getElementById('fbUrl').value;
-    const fetchBtn = document.getElementById('fetchBtn');
+    const btnText = document.getElementById('btnText');
     const loader = document.getElementById('loader');
     const resultCard = document.getElementById('resultCard');
 
-    if (!urlInput) return alert("Paste a link first!");
+    if (!urlInput) return;
 
-    fetchBtn.disabled = true;
+    btnText.disabled = true;
     loader.classList.remove('hidden');
     resultCard.classList.add('hidden');
 
@@ -17,58 +17,31 @@ async function fetchFBVideo() {
         if (data.success && data.result) {
             const res = data.result;
             
-            // Set basic info
-            document.getElementById('fbThumb').src = res.thumbnail;
-            document.getElementById('fbTitle').innerText = res.title || "Facebook Video";
-            document.getElementById('fbDuration').innerText = "Duration: " + (res.duration || "N/A");
+            document.getElementById('thumb').src = res.thumbnail;
+            document.getElementById('title').innerText = res.title || "Facebook Video";
 
-            // Setup HD Button
-            const btnHD = document.getElementById('btnHD');
-            const txtHD = document.getElementById('txtHD');
-            btnHD.onclick = () => startImmediateDownload(res.hd_video, "HD_Video.mp4", txtHD);
+            const dlBtn = document.getElementById('dlHD');
+            
+            // USE HD VIDEO LINK (It's usually the best quality with sound)
+            const videoUrl = res.hd_video || res.sd_video;
 
-            // Setup SD Button
-            const btnSD = document.getElementById('btnSD');
-            const txtSD = document.getElementById('txtSD');
-            btnSD.onclick = () => startImmediateDownload(res.sd_video, "SD_Video.mp4", txtSD);
+            dlBtn.onclick = () => {
+                // Method 1: Direct Link Trigger (Best for Sound + Files Folder)
+                const link = document.createElement('a');
+                link.href = videoUrl;
+                link.download = `FB_Video_${Date.now()}.mp4`;
+                link.target = '_blank'; // Opens in new tab to force browser downloader
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            };
 
             resultCard.classList.remove('hidden');
-        } else {
-            alert("No video found. Check if the post is public.");
         }
-    } catch (error) {
-        alert("API Error. Try again later.");
+    } catch (e) {
+        alert("Error fetching video.");
     } finally {
-        fetchBtn.disabled = false;
+        btnText.disabled = false;
         loader.classList.add('hidden');
     }
-}
-
-async function startImmediateDownload(videoUrl, filename, textElement) {
-    if (!videoUrl) return alert("Quality not available.");
-    
-    const originalText = textElement.innerText;
-    textElement.innerText = "Saving...";
-
-    try {
-        const response = await fetch(videoUrl);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-        textElement.innerText = "Done!";
-    } catch (e) {
-        // If blob fails, use standard download as fallback
-        window.open(videoUrl, '_blank');
-        textElement.innerText = "Redirecting...";
-    }
-
-    setTimeout(() => { textElement.innerText = originalText; }, 3000);
-}
+};
