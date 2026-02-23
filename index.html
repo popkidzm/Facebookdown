@@ -3,59 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FB Downloader | GiftedTech</title>
+    <title>FB Downloader</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #000; font-family: sans-serif; }
-        .app-container { max-width: 400px; width: 100%; margin: auto; }
-        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
-        .btn-fb { background: #1877F2; color: white; font-weight: 800; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .loading-pulse { animation: pulse 1.5s infinite; }
+        body { background: #000; color: white; }
+        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
 
-    <div class="app-container">
+    <div class="w-full max-w-[380px]">
         <div class="text-center mb-6">
-            <h1 class="text-3xl font-black text-white tracking-tighter">FACE<span class="text-[#1877F2]">BOOK</span> DL</h1>
+            <h1 class="text-2xl font-black tracking-tighter uppercase">FB <span class="text-blue-500">Video Saver</span></h1>
         </div>
 
         <div class="glass p-1.5 rounded-2xl flex items-center mb-4">
-            <input type="text" id="fbUrl" placeholder="Paste Facebook link..." 
-                class="flex-1 bg-transparent p-3 outline-none text-white text-sm placeholder:text-gray-500">
-            <button onclick="fetchFBVideo()" id="fetchBtn" class="btn-fb px-5 py-3 rounded-xl text-xs uppercase transition active:scale-90">
-                Fetch
-            </button>
+            <input type="text" id="fbUrl" placeholder="Paste Facebook Link..." 
+                class="flex-1 bg-transparent p-3 outline-none text-sm text-white">
+            <button onclick="fetchFB()" id="btnText" class="bg-blue-600 px-5 py-3 rounded-xl text-xs font-bold uppercase">Fetch</button>
         </div>
 
-        <div id="loader" class="hidden text-center py-4">
-            <div class="text-[10px] text-blue-400 font-bold uppercase tracking-widest loading-pulse">Searching Facebook Servers...</div>
-        </div>
+        <div id="loader" class="hidden text-center py-4 animate-pulse text-blue-400 text-xs font-bold">PROCESING...</div>
 
-        <div id="resultCard" class="hidden glass rounded-3xl p-4 animate-in fade-in zoom-in duration-300">
+        <div id="resultCard" class="hidden glass rounded-3xl p-4 transition-all">
             <div class="flex gap-4 items-center">
-                <img id="fbThumb" class="w-24 h-24 object-cover rounded-xl border border-white/10" src="" alt="">
-                
+                <img id="thumb" class="w-20 h-20 object-cover rounded-lg border border-white/10" src="">
                 <div class="flex-1 overflow-hidden">
-                    <h2 id="fbTitle" class="text-white font-bold text-sm truncate mb-0.5">Title</h2>
-                    <p id="fbDuration" class="text-gray-400 text-[11px] mb-3">Duration: --</p>
+                    <h2 id="title" class="font-bold text-sm truncate">Video Title</h2>
+                    <p class="text-gray-500 text-[10px] mb-3 uppercase tracking-widest">Ready to save</p>
                     
-                    <div class="grid grid-cols-2 gap-2">
-                        <button id="btnHD" class="bg-blue-600 text-white py-2 rounded-lg text-[10px] font-bold flex flex-col items-center">
-                            <span id="txtHD">HD Video</span>
-                        </button>
-                        <button id="btnSD" class="bg-gray-700 text-white py-2 rounded-lg text-[10px] font-bold flex flex-col items-center">
-                            <span id="txtSD">SD Video</span>
-                        </button>
-                    </div>
+                    <button id="dlHD" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-xl text-xs font-black uppercase flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> Download Video
+                    </button>
                 </div>
             </div>
+            <p class="text-[9px] text-gray-500 mt-4 text-center italic">If video plays, tap the 3 dots (⋮) & select "Download"</p>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
