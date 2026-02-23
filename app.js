@@ -16,24 +16,34 @@ window.fetchFB = async () => {
 
         if (data.success && data.result) {
             const res = data.result;
-            
             document.getElementById('thumb').src = res.thumbnail;
             document.getElementById('title').innerText = res.title || "Facebook Video";
 
             const dlBtn = document.getElementById('dlHD');
-            
-            // USE HD VIDEO LINK (It's usually the best quality with sound)
             const videoUrl = res.hd_video || res.sd_video;
 
-            dlBtn.onclick = () => {
-                // Method 1: Direct Link Trigger (Best for Sound + Files Folder)
-                const link = document.createElement('a');
-                link.href = videoUrl;
-                link.download = `FB_Video_${Date.now()}.mp4`;
-                link.target = '_blank'; // Opens in new tab to force browser downloader
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+            // DIRECT DOWNLOAD ACTION
+            dlBtn.onclick = async () => {
+                const originalContent = dlBtn.innerHTML;
+                dlBtn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Saving...`;
+                dlBtn.disabled = true;
+
+                try {
+                    await startDirectDownload(videoUrl, `FB_Video_${Date.now()}.mp4`);
+                    dlBtn.innerHTML = `<i class="fas fa-check"></i> Saved!`;
+                } catch (e) {
+                    // Fallback: If security blocks the silent download, use a hidden link
+                    const link = document.createElement('a');
+                    link.href = videoUrl;
+                    link.download = "video.mp4";
+                    link.click();
+                    dlBtn.innerHTML = originalContent;
+                } finally {
+                    setTimeout(() => {
+                        dlBtn.innerHTML = originalContent;
+                        dlBtn.disabled = false;
+                    }, 3000);
+                }
             };
 
             resultCard.classList.remove('hidden');
@@ -45,3 +55,26 @@ window.fetchFB = async () => {
         loader.classList.add('hidden');
     }
 };
+
+/**
+ * Downloads the video data into memory first
+ * to ensure sound is kept and it saves directly to Files.
+ */
+async function startDirectDownload(url, filename) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = blobUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Clean up memory
+    setTimeout(() => {
+        window.URL.revokeObjectURL(blobUrl);
+        document.body.removeChild(a);
+    }, 1000);
+}
